@@ -1,0 +1,3 @@
+[submodule "CCore.Net"]
+	path = CCore.Net
+	url = https://github.com/Karolis2011/CCore.Net.git
