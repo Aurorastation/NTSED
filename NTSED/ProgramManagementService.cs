@@ -33,6 +33,7 @@ namespace NTSED
             {
                 case ProgramType.Computer:
                     program = new ComputerProgram(serviceProvider.GetRequiredService<ILogger<ComputerProgram>>());
+                    _ = program.Initialize();
                     break;
                 default:
                     throw new ArgumentException("Unsupported Type");

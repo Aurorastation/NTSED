@@ -16,14 +16,15 @@ namespace NTSED.ProgramTypes
 
         public string GetTerminalBuffer() => Terminal.Stringify();
 
-        public void HandleTopic(string hash, string data)
+        public async Task HandleTopic(string hash, string data)
         {
             var callback = GetCallback(hash);
             if (callback == null)
                 return;
-            runtime.Do(() =>
+            await runtime.Do(() =>
             {
-
+                JsValue dataParam = data == null ? JsNull.Null : new JsString(data);
+                callback.Invoke(JsObject.GlobalObject, dataParam);
             }, CCore.Net.JsTaskPriority.CALLBACK);
         }
 

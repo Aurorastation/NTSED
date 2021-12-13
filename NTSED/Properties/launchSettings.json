@@ -12,6 +12,7 @@
     "NTSED": {
       "commandName": "Project",
       "launchBrowser": true,
+      "launchUrl": "legacy.html",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HOSTINGSTARTUPASSEMBLIES": "Microsoft.AspNetCore.SpaProxy"

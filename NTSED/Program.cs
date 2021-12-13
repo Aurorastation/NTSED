@@ -24,9 +24,9 @@ app.MapGet("/clear", int (ProgramManagementService pms) =>
     return 1;
 });
 app.MapGet("/new_program", int (ProgramManagementService pms, [FromQuery] ProgramType type) => pms.NewProgram(type));
-app.MapPost("/execute", int (ProgramManagementService pms, [FromQuery] int id, [FromBody] string script, [FromQuery] string scriptName) =>
+app.MapPost("/execute", async Task<int> (ProgramManagementService pms, [FromQuery] int id, [FromBody] string script, [FromQuery] string scriptName) =>
 {
-    pms.GetProgram(id).ExecuteScript(script, scriptName);
+    await pms.GetProgram(id).ExecuteScript(script, scriptName);
     return 1;
 });
 app.MapGet("/remove", int (ProgramManagementService pms, [FromQuery] int id) =>
@@ -35,9 +35,9 @@ app.MapGet("/remove", int (ProgramManagementService pms, [FromQuery] int id) =>
     return 1;
 });
 app.MapGet("/computer/get_buffer", string (ProgramManagementService pms, [FromQuery] int id) => pms.GetProgram<ComputerProgram>(id).GetTerminalBuffer());
-app.MapPost("/computer/topic", int (ProgramManagementService pms, [FromQuery] int id, [FromQuery] string topic, [FromBody] string data) => 
+app.MapPost("/computer/topic", async Task<int> (ProgramManagementService pms, [FromQuery] int id, [FromQuery] string topic, [FromBody] string data) => 
 {
-    pms.GetProgram<ComputerProgram>(id).HandleTopic(topic, data);
+    await pms.GetProgram<ComputerProgram>(id).HandleTopic(topic, data);
     return 1;
 });
 

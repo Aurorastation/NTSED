@@ -30,6 +30,11 @@ namespace NTSED.ProgramTypes.ScriptInner
             Height = height;
             this.context = context;
             buffer = new TerminalChar[Width,Height];
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                {
+                    buffer[x, y] = new TerminalChar();
+                }
         }
 
         public Terminal(BaseProgram context) : this(64, 20, context) { }
@@ -80,8 +85,7 @@ namespace NTSED.ProgramTypes.ScriptInner
             for (int x = 0; x < Width; x++)
                 for (int y = 0; y < Height; y++)
                 {
-                    buffer[x, y].Foreground = Foreground;
-                    buffer[x, y].Background = Background;
+                    buffer[x, y] = new TerminalChar();
                 }
 
         }
@@ -306,7 +310,7 @@ namespace NTSED.ProgramTypes.ScriptInner
         }
 
 
-        struct TerminalChar
+        class TerminalChar
         {
             public char Text = ' ';
             public Color Background = new Color(0, 0, 0);
@@ -344,7 +348,7 @@ namespace NTSED.ProgramTypes.ScriptInner
 
         }
 
-        public struct Color
+        public class Color
         {
             public byte R = 0;
             public byte G = 0;
