@@ -11,6 +11,7 @@ namespace NTSED.ProgramTypes
     {
         public static readonly TimeSpan DEFAULT_SCRIPT_TIMEOUT = new TimeSpan(TimeSpan.TicksPerMillisecond * 2000);
         public static readonly TimeSpan DEFAULT_PROMISE_TIMEOUT = new TimeSpan(TimeSpan.TicksPerMillisecond * 2000);
+        public static readonly TimeSpan DEFAULT_TCOM_TIMEOUT = new TimeSpan(TimeSpan.TicksPerMillisecond * 500);
         private static Random random = new Random();
         public const int CALLBACK_HASH_LEN = 12;
         protected ScheduledJsRuntime runtime;

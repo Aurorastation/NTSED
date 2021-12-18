@@ -35,6 +35,10 @@ namespace NTSED
                     program = new ComputerProgram(serviceProvider.GetRequiredService<ILogger<ComputerProgram>>());
                     _ = program.Initialize();
                     break;
+                case ProgramType.TCom:
+                    program = new TComProgram(serviceProvider.GetRequiredService<ILogger<TComProgram>>());
+                    _ = program.Initialize();
+                    break;
                 default:
                     throw new ArgumentException("Unsupported Type");
             }

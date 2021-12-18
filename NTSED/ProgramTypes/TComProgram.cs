@@ -1,18 +1,28 @@
 ﻿using CCore.Net.JsRt;
 using CCore.Net.Managed;
 using NTSED.CCoreHelpers;
+using NTSED.Models;
 using NTSED.ProgramTypes.Interfaces;
 using NTSED.ProgramTypes.ScriptInner;
 
 namespace NTSED.ProgramTypes
 {
-    public class ComputerProgram : BaseProgram, IHasTerminal
+    public class TComProgram : BaseProgram, IHasTerminal
     {
         private Terminal Terminal;
+        private TCom Com;
 
-        public ComputerProgram(ILogger logger) : base(logger)
+        public TComProgram(ILogger logger) : base(logger)
         {
             Terminal = new Terminal(this);
+            Com = new TCom();
+        }
+
+        public override void InstallInterfaces()
+        {
+            base.InstallInterfaces();
+            JsObject.GlobalObject["Term"] = JsManagedObject.Obtain(Terminal, StrictMappingValidator.Instance);
+            JsObject.GlobalObject["Com"] = JsManagedObject.Obtain(Com, StrictMappingValidator.Instance);
         }
 
         public string GetTerminalBuffer() => Terminal.Stringify();
@@ -29,11 +39,18 @@ namespace NTSED.ProgramTypes
             }, DEFAULT_SCRIPT_TIMEOUT, CCore.Net.JsTaskPriority.CALLBACK);
         }
 
-        public override void InstallInterfaces()
+        public void ProcessSignal(TComSignal signal)
         {
-            base.InstallInterfaces();
-            JsObject.GlobalObject["Term"] = JsManagedObject.Obtain(Terminal, StrictMappingValidator.Instance);
+            var handler = Com.signalHandler;
+            if (handler != null)
+                DoTimed(() =>
+                {
+                    Com.Broadcast(signal);
+                    handler.Invoke(JsObject.GlobalObject, JsManagedObject.Obtain(signal, StrictMappingValidator.Instance));
+                }, DEFAULT_TCOM_TIMEOUT, CCore.Net.JsTaskPriority.CALLBACK);
         }
+
+        public TComSignal[] GetSignals() => Com.GetSignals();
 
         internal override bool HandleException(Exception exception)
         {
