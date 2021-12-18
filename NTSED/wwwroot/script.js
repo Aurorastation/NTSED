@@ -21,18 +21,16 @@ const to = {
         topic = this.to.substring(1);
         data = prompt("Please enter input...", "");
       }
-      $.ajax({
-        type: "GET",
-        url: `/computer/topic`,
-        data: {
+      axios({
+        url: "/computer/topic",
+        method: "post",
+        params: {
           id: programId,
           topic: topic,
-          data: data,
         },
-        success: (data) => {
-          get_buffer();
-        },
-      });
+        headers: { "Content-Type": "application/json" },
+        data: JSON.stringify(data),
+      }).then(() => get_buffer());
     },
   },
   template:

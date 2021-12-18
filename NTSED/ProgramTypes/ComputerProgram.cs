@@ -21,11 +21,11 @@ namespace NTSED.ProgramTypes
             var callback = GetCallback(hash);
             if (callback == null)
                 return;
-            await runtime.Do(() =>
+            await DoTimed(() =>
             {
                 JsValue dataParam = data == null ? JsNull.Null : new JsString(data);
                 callback.Invoke(JsObject.GlobalObject, dataParam);
-            }, CCore.Net.JsTaskPriority.CALLBACK);
+            }, DEFAULT_SCRIPT_TIMEOUT, CCore.Net.JsTaskPriority.CALLBACK);
         }
 
         public override void InstallInterfaces()
@@ -36,8 +36,12 @@ namespace NTSED.ProgramTypes
 
         internal override bool HandleException(Exception exception)
         {
-            var ex = exception as JsScriptException;
-            if (ex != null)
+            if (exception is JsTerminationException)
+            {
+                Terminal.PrintException(exception);
+                return true;
+            }
+            if (exception is JsScriptException ex)
             {
                 Terminal.PrintException(ex);
                 return true;

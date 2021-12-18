@@ -19,7 +19,7 @@ namespace NTSED.ProgramTypes
 
         public BaseProgram(ILogger logger)
         {
-            runtime = new ScheduledJsRuntime();
+            runtime = new ScheduledJsRuntime(JsRuntimeAttributes.AllowScriptInterrupt);
             this.logger = logger;
         }
 
@@ -68,6 +68,7 @@ namespace NTSED.ProgramTypes
 
         internal Tuple<string, JsFunction> RegisterCallback(JsFunction callback)
         {
+            callback.AddRef();
             var hash = GenerateCallbackHash();
             callbacks[hash] = new WeakReference<JsFunction>(callback);
             return new Tuple<string, JsFunction>(hash, callback);

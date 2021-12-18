@@ -17,7 +17,7 @@ namespace NTSED.ProgramTypes.ScriptInner
         [JsMapped("height")]
         public int Height { get; private set; } = 20;
 
-        TerminalChar[,] buffer;
+        TerminalChar[][] buffer;
 
         public Color Background = new Color(0, 0, 0);
         public Color Foreground = new Color(255, 255, 255);
@@ -29,12 +29,15 @@ namespace NTSED.ProgramTypes.ScriptInner
             Width = width;
             Height = height;
             this.context = context;
-            buffer = new TerminalChar[Width,Height];
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
+            buffer = new TerminalChar[Height][];
+            for (int y = 0; y < Height; y++)
+            {
+                buffer[y] = new TerminalChar[Width];
+                for (int x = 0; x < Width; x++)
                 {
-                    buffer[x, y] = new TerminalChar();
+                    buffer[y][x] = new TerminalChar(' ', Background, Foreground);
                 }
+            }
         }
 
         public Terminal(BaseProgram context) : this(64, 20, context) { }
@@ -81,12 +84,15 @@ namespace NTSED.ProgramTypes.ScriptInner
         {
             CursorX = 0;
             CursorY = 0;
-            buffer = new TerminalChar[Width, Height];
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
+            buffer = new TerminalChar[Height][];
+            for (int y = 0; y < Height; y++)
+            {
+                buffer[y] = new TerminalChar[Width];
+                for (int x = 0; x < Width; x++)
                 {
-                    buffer[x, y] = new TerminalChar();
+                    buffer[y][x] = new TerminalChar(' ', Background, Foreground);
                 }
+            }
 
         }
         [JsCallable("write")]
@@ -142,7 +148,7 @@ namespace NTSED.ProgramTypes.ScriptInner
                 {
                     lock (buffer)
                     {
-                        buffer[CursorX,CursorY] = new TerminalChar(c, Background, Foreground, topic, prompt);
+                        buffer[CursorY][CursorX] = new TerminalChar(c, Background, Foreground, topic, prompt);
                     }
                     MoveRight();
                 }
@@ -182,8 +188,8 @@ namespace NTSED.ProgramTypes.ScriptInner
         {
             if (y >= 0 && x >= 0 && x < Width && y < Height)
             {
-                buffer[y,x].Callback = callback;
-                buffer[y,x].Prompt = prompt;
+                buffer[y][x].Callback = callback;
+                buffer[y][x].Prompt = prompt;
 
             }
         }
@@ -200,7 +206,7 @@ namespace NTSED.ProgramTypes.ScriptInner
                     string? lastTopic = null;
                     for (int x = 0; x < Width; x++)
                     {
-                        var termChar = buffer[x, y];
+                        var termChar = buffer[y][x];
                         if (x == 0)
                         {
                             // Jut clean line init
@@ -287,12 +293,10 @@ namespace NTSED.ProgramTypes.ScriptInner
             if (CursorY >= Height) // Are we past buffer Heigth?
             {
                 CursorY--; // Back of
-                Array.Copy(buffer, Width, buffer, 0, buffer.Length - Width);
+                Array.Copy(buffer, 1, buffer, 0, Height - 1);
+                buffer[Height - 1] = new TerminalChar[Width];
                 for (int x = 0; x < Width; x++)
-                {
-                    buffer[Height - 1, x].Background = Background;
-                    buffer[Height - 1, x].Foreground = Foreground;
-                }
+                    buffer[Height - 1][x] = new TerminalChar(' ', Background, Foreground);
             }
         }
 

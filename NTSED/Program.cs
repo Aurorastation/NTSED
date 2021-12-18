@@ -35,7 +35,7 @@ app.MapGet("/remove", int (ProgramManagementService pms, [FromQuery] int id) =>
     return 1;
 });
 app.MapGet("/computer/get_buffer", string (ProgramManagementService pms, [FromQuery] int id) => pms.GetProgram<ComputerProgram>(id).GetTerminalBuffer());
-app.MapPost("/computer/topic", async Task<int> (ProgramManagementService pms, [FromQuery] int id, [FromQuery] string topic, [FromBody] string data) => 
+app.MapPost("/computer/topic", async Task<int> (ProgramManagementService pms, [FromQuery] int id, [FromQuery] string topic, [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Allow)] string data) => 
 {
     await pms.GetProgram<ComputerProgram>(id).HandleTopic(topic, data);
     return 1;
