@@ -22,7 +22,7 @@ const to = {
         data = prompt("Please enter input...", "");
       }
       axios({
-        url: "/computer/topic",
+          url: "/terminal/topic",
         method: "post",
         params: {
           id: programId,

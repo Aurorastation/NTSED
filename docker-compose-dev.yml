@@ -1,0 +1,17 @@
+services:
+  ntsed-api:
+    build:
+      context: .
+      dockerfile: ./NTSED/Dockerfile
+    ports:
+      - "1945:80"
+  ntsed-ui:
+    build:
+      context: ./NTSED-UI
+      dockerfile: ./dev.Dockerfile
+    ports:
+      - "1946:1946"
+    volumes:
+      - ./NTSED-UI:/app
+    environment:
+      - ASPNETCORE_URLS=http://ntsed-api:80

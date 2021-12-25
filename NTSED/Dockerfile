@@ -7,6 +7,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["NTSED/NTSED.csproj", "NTSED/"]
+COPY ["CCore.Net/CCore.Net/CCore.Net.csproj", "CCore.Net/CCore.Net/"]
 RUN dotnet restore "NTSED/NTSED.csproj"
 COPY . .
 WORKDIR "/src/NTSED"

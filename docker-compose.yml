@@ -1,0 +1,12 @@
+services:
+  ntsed-api:
+    build:
+      context: .
+      dockerfile: ./NTSED/Dockerfile
+    ports:
+      - "1945:80"
+  ntsed-ui-prod:
+    build:
+      context: ./NTSED-UI
+    ports:
+      - "1946:80"

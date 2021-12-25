@@ -24,6 +24,7 @@ namespace NTSED
             }
             programs.Clear();
             lastId = 1;
+            GC.Collect();
         }
 
         public int NewProgram(ProgramType type)

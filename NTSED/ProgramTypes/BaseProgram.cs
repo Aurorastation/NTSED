@@ -17,28 +17,48 @@ namespace NTSED.ProgramTypes
         protected ScheduledJsRuntime runtime;
         protected readonly Dictionary<string, WeakReference<JsFunction>> callbacks = new Dictionary<string, WeakReference<JsFunction>>();
         protected readonly ILogger logger;
+        protected DateTime timelastidled = DateTime.Now;
 
         public BaseProgram(ILogger logger)
         {
-            runtime = new ScheduledJsRuntime(JsRuntimeAttributes.AllowScriptInterrupt);
+            runtime = new ScheduledJsRuntime(JsRuntimeAttributes.AllowScriptInterrupt | JsRuntimeAttributes.EnableIdleProcessing);
+            runtime.Scheduler.EnterIdle += Scheduler_EnterIdle;
             this.logger = logger;
+        }
+
+        private void Scheduler_EnterIdle()
+        {
+            if (timelastidled - DateTime.Now > new TimeSpan(0, 0, 10))
+            {
+                runtime.Do(() =>
+                {
+                    JsContext.Idle();
+                }, JsTaskPriority.LOWEST);
+            }
         }
 
         public async Task Initialize()
         {
             await runtime.Do(() =>
             {
-                runtime.SetPromiseContinuationCallback((task, state) =>
-                {
-                    task.AddRef();
-                    DoTimed(() =>
-                    {
-                        task.CallFunction(JsObject.GlobalObject);
-                        task.Release();
-                    }, DEFAULT_PROMISE_TIMEOUT, JsTaskPriority.PROMISE);
-                }, IntPtr.Zero);
+                runtime.SetPromiseContinuationCallback(PromiseContinuationCallback, IntPtr.Zero);
                 InstallInterfaces();
             }, JsTaskPriority.INITIALIZATION);
+        }
+
+        public void PromiseContinuationCallback(JsValueRef task, IntPtr callbackState)
+        {
+            var newTimeout = DEFAULT_PROMISE_TIMEOUT;
+            if(runtime.Scheduler.GetCurrentTask() is IJsTaskTimed taskTimed)
+            {
+                newTimeout = taskTimed.RemainingTime - new TimeSpan(TimeSpan.TicksPerMillisecond * 2); // Add 2 ms penalty.
+            }
+            task.AddRef();
+            DoTimed(() =>
+            {
+                task.CallFunction(JsObject.GlobalObject);
+                task.Release();
+            }, newTimeout, JsTaskPriority.PROMISE);
         }
 
         public virtual void InstallInterfaces()

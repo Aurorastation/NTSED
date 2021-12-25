@@ -71,7 +71,7 @@ function remove_program() {
 function get_buffer() {
   if (programId == null) return;
   axios({
-    url: "/computer/get_buffer",
+      url: "/terminal/get_buffer",
     method: "get",
     params: {
       id: programId,
